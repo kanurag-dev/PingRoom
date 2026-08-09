@@ -34,7 +34,11 @@ function App() {
                     return;
                 }
                 latestMessageId.current = data[data.length - 1]._id;
-                setMessages(prev => [...prev, ...data])
+                setMessages(prev => {
+                    const existingIds = new Set(prev.map(m => m._id));
+                    const newOnes = data.filter(m => !existingIds.has(m._id));
+                    return [...prev, ...newOnes];
+                });
             } catch (err) {
                 console.log(err);
                 setError("Failed to load messages");
@@ -96,9 +100,10 @@ function App() {
             }
 
             const data = await res.json();
-            latestMessageId.current = data._id;
-
-            setMessages(prev => [...prev, data]);
+            setMessages(prev => {
+                if (prev.some(m => m._id === data._id)) return prev; // just in case
+                return [...prev, data];
+            });
             setText("");
         } catch (err) {
             console.log(err);
