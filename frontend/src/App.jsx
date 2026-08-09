@@ -18,7 +18,7 @@ function App() {
                 return;
             }
             isFetching.current = true;
-            let url = "http://localhost:3000/api/messages";
+            let url = "https://pingroom-aamq.onrender.com/api/messages";
             if (latestMessageId.current) {
                 url += `?after=${latestMessageId.current}`;
             }
@@ -80,7 +80,7 @@ function App() {
         if (!username.trim() || !text.trim()) return;
 
         try {
-            const res = await fetch("http://localhost:3000/api/messages", {
+            const res = await fetch("https://pingroom-aamq.onrender.com/api/messages", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
