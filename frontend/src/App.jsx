@@ -5,21 +5,31 @@ function App() {
     const [text, setText] = useState("");
 
     const latestMessageId = useRef(null)
-    const isFetching=useRef(false);
+    const isFetching = useRef(false);
+    const [username, setUsername] = useState("");
+    const userId = "123";
+    const messagesEndRef = useRef(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         const getMessages = async () => {
-            if(isFetching.current){
+            if (isFetching.current) {
                 return;
             }
-            isFetching.current=true;
+            isFetching.current = true;
             let url = "http://localhost:3000/api/messages";
             if (latestMessageId.current) {
                 url += `?after=${latestMessageId.current}`;
             }
             try {
                 const res = await fetch(url);
+                if (!res.ok) {
+                    throw new Error("Failed to load messages");
+                }
                 const data = await res.json();
+                setLoading(false)
+                setError("")
                 if (data.length === 0) {
                     return;
                 }
@@ -27,26 +37,26 @@ function App() {
                 setMessages(prev => [...prev, ...data])
             } catch (err) {
                 console.log(err);
+                setError("Failed to load messages");
             }
-            finally{
-                isFetching.current=false;
+            finally {
+                isFetching.current = false;
             }
         };
         getMessages();
-        
+
 
         const intervalId = setInterval(() => {
-            
-
-
-
             getMessages();
-
         }, 2000);
         return () => {
             clearInterval(intervalId);
         }
     }, [])
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView();
+    }, [messages])
+
 
 
     // useEffect(() => {
@@ -67,7 +77,7 @@ function App() {
     async function sendMessage(e) {
         e.preventDefault();
 
-        if (!text.trim()) return;
+        if (!username.trim() || !text.trim()) return;
 
         try {
             const res = await fetch("http://localhost:3000/api/messages", {
@@ -81,6 +91,9 @@ function App() {
                     text
                 })
             });
+            if (!res.ok) {
+                throw new Error("Failed to send message");
+            }
 
             const data = await res.json();
             latestMessageId.current = data._id;
@@ -94,15 +107,26 @@ function App() {
 
     return (
         <div>
-            <h1>Global Chat</h1>
+            <h1>YAP OUT</h1>
+
+            <input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter username"
+            />
+            {loading && <p>Loading messages...</p>}
+            {error && <p>{error}</p>}
 
             <div>
                 {messages.map((message) => (
                     <p key={message._id}>
                         <strong>{message.username}:</strong>{" "}
-                        {message.text}
+                        {message.text}{" "}
+                        <small>{new Date(message.createdAt).toLocaleTimeString()}</small>
                     </p>
                 ))}
+                <div ref={messagesEndRef}></div>
+
             </div>
 
             <form onSubmit={sendMessage}>
