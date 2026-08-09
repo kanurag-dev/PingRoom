@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import PixelBlast from './PixelBlast';
+
 
 function App() {
     const [messages, setMessages] = useState([]);
@@ -9,17 +11,17 @@ function App() {
     const [hasUsername, setHasUsername] = useState(
         !!localStorage.getItem("username")
     );
-    const [username, setUsername] = useState(localStorage.getItem("username")||"");
+    const [username, setUsername] = useState(localStorage.getItem("username") || "");
     const userId = "123";
     const messagesEndRef = useRef(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    
 
-    function enterChat(e){
+
+    function enterChat(e) {
         e.preventDefault();
-        if(!username.trim()) return;
-        localStorage.setItem("username",username.trim());
+        if (!username.trim()) return;
+        localStorage.setItem("username", username.trim());
         setUsername(username.trim());
         setHasUsername(true);
     }
@@ -124,50 +126,84 @@ function App() {
     }
 
     return (
-        <div>
-            {!hasUsername?(
-                <form onSubmit={enterChat}>
-                    <h1>Ping Room</h1>
-                    <p>Enter your username to continue</p>
+        <div className="min-h-screen bg-[#0b0b0f]">
+
+            {!hasUsername ? (
+                <div className="relative min-h-screen overflow-hidden">
+                    <PixelBlast
+                        variant="square"
+                        pixelSize={4}
+
+                        patternScale={2}
+                        patternDensity={1.1}
+                        pixelSizeJitter={0}
+                        enableRipples
+                        rippleSpeed={0.4}
+                        rippleThickness={0.12}
+                        rippleIntensityScale={1.5}
+                        liquid={false}
+                        liquidStrength={0.12}
+                        liquidRadius={1.2}
+                        liquidWobbleSpeed={5}
+                        speed={0.5}
+                        edgeFade={0.25}
+                        color="#B497CF"
+                        transparent
+                        className="absolute inset-0 z-0"
+                    />
+
+                    <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+
+                        <form onSubmit={enterChat} className="pointer-events-auto">
+                            <h1 className="text-6xl font-bold font-mono text-white text-center tracking-tight">Ping Room</h1>
+                            <p className="mt-3 mb-8 text-center text-slate-400">Enter your username to continue</p>
+                            <input
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Enter Username"
+                                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 outline-none backdrop-blur-sm transition focus:border-purple-300/40 focus:bg-white/10" />
+                            <button
+                                type="submit"
+                                className="mt-4 w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 font-medium text-slate-200 transition hover:bg-slate-800 hover:border-slate-600 active:scale-[0.98]"
+                            >Enter Chat</button>
+                        </form>
+                    </div>
+                </div>
+
+            ) : (<div className="min-h-screen bg-gradient-to-b from-slate-700 to-slate-800">
+
+                <h1 className="text-4xl font-bold text-blue-500">YAP OUT</h1>
+
+
+                {loading && <p>Loading messages...</p>}
+                {error && <p>{error}</p>}
+
+                <div>
+                    {messages.map((message) => (
+                        <p key={message._id}>
+                            <strong>{message.username}:</strong>{" "}
+                            {message.text}{" "}
+                            <small>{new Date(message.createdAt).toLocaleTimeString()}</small>
+                        </p>
+                    ))}
+                    <div ref={messagesEndRef}></div>
+
+                </div>
+
+                <form onSubmit={sendMessage}>
                     <input
-                    value={username}
-                    onChange={(e)=>setUsername(e.target.value)}
-                    placeholder="Enter Username"/>
-                    <button type="submit">Enter Chat</button>
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        placeholder="Type a message..."
+                    />
+
+                    <button type="submit">
+                        Send
+                    </button>
                 </form>
-                
-            ):(<>
-        
-            <h1>YAP OUT</h1>
-
-            
-            {loading && <p>Loading messages...</p>}
-            {error && <p>{error}</p>}
-
-            <div>
-                {messages.map((message) => (
-                    <p key={message._id}>
-                        <strong>{message.username}:</strong>{" "}
-                        {message.text}{" "}
-                        <small>{new Date(message.createdAt).toLocaleTimeString()}</small>
-                    </p>
-                ))}
-                <div ref={messagesEndRef}></div>
-
-            </div>
-
-            <form onSubmit={sendMessage}>
-                <input
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder="Type a message..."
-                />
-
-                <button type="submit">
-                    Send
-                </button>
-            </form></>)}
+            </div>)}
         </div>
+
     );
 }
 
