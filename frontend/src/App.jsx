@@ -96,7 +96,7 @@ function App() {
             }
 
             const data = await res.json();
-            
+            latestMessageId.current = data._id;
 
             setMessages(prev => [...prev, data]);
             setText("");
