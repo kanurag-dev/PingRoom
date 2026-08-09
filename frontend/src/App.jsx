@@ -6,8 +6,6 @@ function App() {
 
     const latestMessageId = useRef(null)
     const isFetching=useRef(false);
-    const username = "TestUser";
-    const userId = "123";
 
     useEffect(() => {
         const getMessages = async () => {
