@@ -6,11 +6,24 @@ function App() {
 
     const latestMessageId = useRef(null)
     const isFetching = useRef(false);
-    const [username, setUsername] = useState("");
+    const [hasUsername, setHasUsername] = useState(
+        !!localStorage.getItem("username")
+    );
+    const [username, setUsername] = useState(localStorage.getItem("username")||"");
     const userId = "123";
     const messagesEndRef = useRef(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    
+
+    function enterChat(e){
+        e.preventDefault();
+        if(!username.trim()) return;
+        localStorage.setItem("username",username.trim());
+        setUsername(username.trim());
+        setHasUsername(true);
+    }
+
 
     useEffect(() => {
         const getMessages = async () => {
@@ -112,13 +125,22 @@ function App() {
 
     return (
         <div>
+            {!hasUsername?(
+                <form onSubmit={enterChat}>
+                    <h1>Ping Room</h1>
+                    <p>Enter your username to continue</p>
+                    <input
+                    value={username}
+                    onChange={(e)=>setUsername(e.target.value)}
+                    placeholder="Enter Username"/>
+                    <button type="submit">Enter Chat</button>
+                </form>
+                
+            ):(<>
+        
             <h1>YAP OUT</h1>
 
-            <input
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
-            />
+            
             {loading && <p>Loading messages...</p>}
             {error && <p>{error}</p>}
 
@@ -144,7 +166,7 @@ function App() {
                 <button type="submit">
                     Send
                 </button>
-            </form>
+            </form></>)}
         </div>
     );
 }
