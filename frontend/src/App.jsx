@@ -170,41 +170,80 @@ function App() {
                     </div>
                 </div>
 
-            ) : (<div className="min-h-screen bg-gradient-to-b from-slate-700 to-slate-800">
+            ) : (
+    <div className="flex h-screen flex-col bg-gradient-to-b from-[#16161c] to-[#0b0b0f]">
 
-                <h1 className="text-4xl font-bold text-blue-500">YAP OUT</h1>
-
-
-                {loading && <p>Loading messages...</p>}
-                {error && <p>{error}</p>}
-
-                <div>
-                    {messages.map((message) => (
-                        <p key={message._id}>
-                            <strong>{message.username}:</strong>{" "}
-                            {message.text}{" "}
-                            <small>{new Date(message.createdAt).toLocaleTimeString()}</small>
-                        </p>
-                    ))}
-                    <div ref={messagesEndRef}></div>
-
-                </div>
-
-                <form onSubmit={sendMessage}>
-                    <input
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        placeholder="Type a message..."
-                    />
-
-                    <button type="submit">
-                        Send
-                    </button>
-                </form>
-            </div>)}
+        <div className="flex items-center justify-between border-b border-white/5 px-6 py-4">
+            <h1 className="text-xl font-bold tracking-tight text-white">
+                Ping Room
+            </h1>
+            <span className="text-sm text-slate-400">
+                {username}
+            </span>
         </div>
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+            {loading && (
+                <p className="text-center text-sm text-slate-500">Loading messages...</p>
+            )}
+            {error && (
+                <p className="text-center text-sm text-red-400">{error}</p>
+            )}
 
-    );
+            <div className="mx-auto flex max-w-2xl flex-col gap-2">
+                {messages.map((message) => {
+                    const isMe = message.username === username;
+                    return (
+                        <div
+                            key={message._id}
+                            className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
+                        >
+                            <div
+                                className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm ${
+                                    isMe
+                                        ? "bg-purple-600 text-white"
+                                        : "bg-white/10 text-slate-100"
+                                }`}
+                            >
+                                {!isMe && (
+                                    <p className="mb-0.5 text-xs font-semibold text-purple-300">
+                                        {message.username}
+                                    </p>
+                                )}
+                                <p>{message.text}</p>
+                            </div>
+                            <span className="mt-1 px-1 text-[10px] text-slate-500">
+                                {new Date(message.createdAt).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                })}
+                            </span>
+                        </div>
+                    );
+                })}
+                <div ref={messagesEndRef}></div>
+            </div>
+        </div>
+        <form
+            onSubmit={sendMessage}
+            className="flex items-center gap-3 border-t border-white/5 bg-[#0b0b0f] px-4 py-3"
+        >
+            <input
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Type a message..."
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-purple-300/40 focus:bg-white/10"
+            />
+            <button
+                type="submit"
+                className="rounded-xl bg-purple-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-purple-500 active:scale-[0.98]"
+            >
+                Send
+            </button>
+        </form>
+    </div>
+    )}
+    </div>
+  );
 }
 
 export default App;
