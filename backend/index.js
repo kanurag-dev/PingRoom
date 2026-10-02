@@ -5,6 +5,7 @@ const app=express();
 const connectDB=require("./db")
 const dotenv=require("dotenv")
 const messageRoutes=require("./routes/messages")
+const authRoutes=require("./routes/auth.routes")
 
 dotenv.config();
 app.use(express.json())
@@ -12,6 +13,7 @@ app.use(cors());
 connectDB();
 
 app.use("/api/messages",messageRoutes)
+app.use("/api/auth",authRoutes)
 
 app.get("/",(req,res)=>{
     res.json({message:"GLobal chat by API"})
